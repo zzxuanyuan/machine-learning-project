@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import sys
 import Parser
 
 class JobLifeCycle:
@@ -25,9 +26,15 @@ class JobLifeCycle:
 		self.pairActStateList.append(tup)
 	
 
-preJobSet = {}
-curJobSet = {}
-parser = Parser(sys.argv[1])
+preJobList = []
+parser = Parser.Parser(sys.argv[1])
+with open(sys.argv[1], "r") as lines:
+	for line in lines:
+		snapShot = parser.readLine(line)
+		preJobList = parser.extractJobList(line)
+		print preJobList
+
+'''
 with open(sys.argv[1], "r") as lines:
 	cnt = 0
 	for line in lines:
@@ -43,4 +50,4 @@ with open(sys.argv[1], "r") as lines:
 		snapShot = parser.readLine(line)
 		for job in snapShot.jobList:
 			print job.state,job.activity
-
+'''

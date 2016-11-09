@@ -25,11 +25,11 @@ class Job:
 	
 class SnapShot:
 	timeStamp = ""
-	jobList = []
+	jobDict = {}
 
-	def __init__(self,timeStamp,jobList):
+	def __init__(self,timeStamp,jobDict):
 		self.timeStamp = timeStamp
-		self.jobList = jobList
+		self.jobDict = jobDict
 
 	
 def itemParser(its):
@@ -85,12 +85,12 @@ def itemParser(its):
 	return item
 
 def actParser(acts):
-	itemList = []
+	itemDict = {}
 	actList = acts.split(', ')
 	for i in range(len(actList)):
 		item = itemParser(actList[i])
-		itemList.append(item)
-	return itemList
+		itemDict[item.jobId] = item
+	return itemDict
 
 def lineParser(line):
 	startTime = line.index("#")
@@ -100,9 +100,9 @@ def lineParser(line):
 	startList = body.index("[")
 	endList = body.rfind("]")
 	substr = body[startList+1:endList]
-	actList = actParser(substr)
+	actDict = actParser(substr)
 	timeStrip = time.strip()
-	snapShot = SnapShot(timeStrip, actList)
+	snapShot = SnapShot(timeStrip, actDict)
 	return snapShot
 
 class Parser:
@@ -120,6 +120,11 @@ class Parser:
 		snapShot = lineParser(line)
 		return snapShot
 
+	def extractJobList(self,line):
+		snapShot = lineParser(line)
+		jobDict = snapShot.jobDict
+		return jobDict.keys()
+
 	def readFile(self):
 		with open(self.fileName, "r") as lines:
 			for line in lines:
@@ -127,17 +132,16 @@ class Parser:
 				self.snapShotList.append(snapShot)
 		return self.snapShotList
 
-
+'''
 parser = Parser(sys.argv[1])
 with open(sys.argv[1], "r") as lines:
 	for line in lines:
 		snapShot = parser.readLine(line)
-		for job in snapShot.jobList:
-			print job.state,job.activity
+		for job in snapShot.jobDict:
+			print "jobId: %s , value: " % (job)
 
 #print parser.readFile()
 
-'''
 with open(sys.argv[1], "r") as lines:
 	cnt = 0
 	for line in lines:
