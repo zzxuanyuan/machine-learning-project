@@ -3,14 +3,14 @@
 import sys
 
 class Job:
-	activity = ""
-	timeAbs = 0
-	name = ""
-	state = ""
-	site = ""
-	toRetire = 0
-	toDie = 0
-	jobId = ""
+#	activity = ""
+#	timeAbs = 0
+#	name = ""
+#	state = ""
+#	site = ""
+#	toRetire = 0
+#	toDie = 0
+#	jobId = ""
 
 	def __init__(self,activity,timeAbs,name,state,site,toRetire,toDie,jobId):
 		self.activity = activity
@@ -24,11 +24,12 @@ class Job:
 
 	
 class SnapShot:
-	timeStamp = ""
-	jobDict = {}
+#	timeStamp = ""
+#	jobDict = {}
 
 	def __init__(self,timeStamp,jobDict):
 		self.timeStamp = timeStamp
+		self.jobDict = {}
 		self.jobDict = jobDict
 
 	
@@ -41,7 +42,7 @@ def itemParser(its):
 	for i in range(len(itemList)):
 		[key, value] = itemList[i].split(' = ')
 		keyStrip = key.strip()
-		itemDict[keyStrip] = value
+		itemDict[keyStrip] = value.strip()
 	if "Activity" in itemDict:
 		activity = itemDict["Activity"]
 	else:
