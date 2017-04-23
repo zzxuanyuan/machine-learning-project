@@ -11,15 +11,25 @@ from datetime import datetime
 import operator
 import Parser
 
-
+print "this is joblifecycle"
+global jobFreqHistoryDict
+global jobTimeHistoryDict
 jobFreqHistoryDict = {}
 jobTimeHistoryDict = {}
+
+#preJobSet = []
+#curJobSet = []
+#preJobLifeCycleDict = {}
+#curJobLifeCycleDict = {}
+#preSnapShot = Parser.SnapShot("", {})
+#curSnapShot = Parser.SnapShot("", {})
 
 class JobFormat:
 
 	def __init__(self, job):
 		self.duration = int(job.endTime) - int(job.startTime)
-		self.maxRuntime = int(job.toRetire) - int(job.startTime)
+		self.retireRuntime = int(job.toRetire) - int(job.startTime)
+		self.killRuntime = int(job.toDie) - int(job.startTime)
 		self.desktopTimeInfo = getDesktopTimeInfo(job.desktopStart, job.desktopEnd)
 		self.host = job.host
 		self.site = job.site
@@ -102,7 +112,7 @@ def getDesktopTimeInfo(deskStart, deskEnd):
 	dateRepStart = dateStartList[1] + "/" + dateStartList[2] + "/" + dateStartList[0][2:]
 	dateRepEnd = dateEndList[1] + "/" + dateEndList[2] + "/" + dateEndList[0][2:]
 	startTime = datetime.strptime(dateRepStart + " " + clockStart, "%m/%d/%y %H:%M:%S")
-	endTime = datetime.strptime(dateRepStart + " " + clockEnd, "%m/%d/%y %H:%M:%S")
+	endTime = datetime.strptime(dateRepEnd + " " + clockEnd, "%m/%d/%y %H:%M:%S")
 	meanTime = startTime+(endTime-startTime)/2
 	timeInfoDict = {}
 	timeInfoDict['meanHour'] = meanTime.hour
@@ -135,53 +145,52 @@ def label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat):
 	if jobFormat.jobId not in jobFreqHistoryDict:
 		jobFreqHistoryDict[jobFormat.jobId] = 1
 		
-print "this is joblifecycle"
-preJobSet = []
-curJobSet = []
-preJobLifeCycleDict = {}
-curJobLifeCycleDict = {}
-parser = Parser.Parser(sys.argv[1])
-with open(sys.argv[1], "r") as lines:
-	cnt = 0
-	for line in lines:
-		curSnapShot = parser.readLine(line)
-		if cnt == 0:
-			preJobSet = set(parser.extractJobList(line))
-			for beg in preJobSet:
-				job0 = curSnapShot.jobDict[beg]
-				job0LifeCycle = JobLifeCycle(job0)
-				preJobLifeCycleDict[beg] = job0LifeCycle
-			preSnapShot = curSnapShot
-			cnt = cnt + 1
-		else:
-			curJobSet = set(parser.extractJobList(line))
-			finishJobSet = preJobSet - curJobSet
-			beginJobSet = curJobSet - preJobSet
-			intersectJobSet = preJobSet & curJobSet
-			for inter in intersectJobSet:
-				interJobLifeCycle = preJobLifeCycleDict[inter]
-				interJob = curSnapShot.jobDict[inter]
-				interJobLifeCycle.stay(interJob.timeAbs,interJob.daemonStart,interJob.activity,interJob.state)
-				curJobLifeCycleDict[inter] = interJobLifeCycle
-			for fin in finishJobSet:
-				finJob = preSnapShot.jobDict[fin]
-				preJobLifeCycleDict[fin].stop(finJob.timeAbs, finJob.desktopTime)
-				jobFormat = JobFormat(preJobLifeCycleDict[fin])
-#				print finJob.jobId,preJobLifeCycleDict[fin].pairActStateList
-#				print finJob.jobId,preJobLifeCycleDict[fin].cycle,preJobLifeCycleDict[fin].desktopStart,preJobLifeCycleDict[fin].desktopEnd,preJobLifeCycleDict[fin].startTime,preJobLifeCycleDict[fin].endTime
-#				print jobFormat.jobId,jobFormat.endTime,jobFormat.toRetire,jobFormat.toDie,jobFormat.label
-#				print jobFormat.activityDict,jobFormat.stateDict,jobFormat.daemonStartSet
-				label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat)
-				jobTimeHistoryDict[finJob.jobId] = finJob.daemonStart
-#				print jobFormat.label
-				print jobFormat.jobId,jobFormat.duration,jobFormat.maxRuntime,jobFormat.desktopTimeInfo['meanHour'],jobFormat.desktopTimeInfo['meanMinute'],jobFormat.desktopTimeInfo['endHour'],jobFormat.desktopTimeInfo['endMinute'],jobFormat.host,jobFormat.site,jobFormat.resource,jobFormat.entry,jobFormat.endTime,jobFormat.toRetire,jobFormat.toDie,jobFormat.preemptedFreq,jobFormat.label
-				preJobLifeCycleDict.pop(fin)
-			for beg in beginJobSet:
-				job = curSnapShot.jobDict[beg]
-				jobLifeCycle = JobLifeCycle(job)
-				curJobLifeCycleDict[beg] = jobLifeCycle
-			preJobSet = curJobSet
-			preJobLifeCycleDict = curJobLifeCycleDict
-			preSnapShot = curSnapShot
-			cnt = cnt + 1
+
+def generateLifeCycleFromFile(fileName, lineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot):
+	cnt = lineCount
+	parser = Parser.Parser(fileName)
+	with open(fileName, "r") as lines:
+		for line in lines:
+			curSnapShot = parser.readLine(line)
+			if cnt == 0:
+				preJobSet = set(parser.extractJobList(line))
+				for beg in preJobSet:
+					job0 = curSnapShot.jobDict[beg]
+					job0LifeCycle = JobLifeCycle(job0)
+					preJobLifeCycleDict[beg] = job0LifeCycle
+				preSnapShot = curSnapShot
+				cnt = cnt + 1
+			else:
+				curJobSet = set(parser.extractJobList(line))
+				finishJobSet = preJobSet - curJobSet
+				beginJobSet = curJobSet - preJobSet
+				intersectJobSet = preJobSet & curJobSet
+				for inter in intersectJobSet:
+					interJobLifeCycle = preJobLifeCycleDict[inter]
+					interJob = curSnapShot.jobDict[inter]
+					interJobLifeCycle.stay(interJob.timeAbs,interJob.daemonStart,interJob.activity,interJob.state)
+					curJobLifeCycleDict[inter] = interJobLifeCycle
+				for fin in finishJobSet:
+					finJob = preSnapShot.jobDict[fin]
+					preJobLifeCycleDict[fin].stop(finJob.timeAbs, finJob.desktopTime)
+					jobFormat = JobFormat(preJobLifeCycleDict[fin])
+	#				print finJob.jobId,preJobLifeCycleDict[fin].pairActStateList
+	#				print finJob.jobId,preJobLifeCycleDict[fin].cycle,preJobLifeCycleDict[fin].desktopStart,preJobLifeCycleDict[fin].desktopEnd,preJobLifeCycleDict[fin].startTime,preJobLifeCycleDict[fin].endTime
+	#				print jobFormat.jobId,jobFormat.endTime,jobFormat.toRetire,jobFormat.toDie,jobFormat.label
+	#				print jobFormat.activityDict,jobFormat.stateDict,jobFormat.daemonStartSet
+	#				print jobFormat.label
+					label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat)
+					jobTimeHistoryDict[finJob.jobId] = finJob.daemonStart
+					print jobFormat.jobId,",",jobFormat.duration,",",jobFormat.retireRuntime,",",jobFormat.killRuntime,",",jobFormat.desktopTimeInfo['meanHour'],",",jobFormat.desktopTimeInfo['meanMinute'],",",jobFormat.desktopTimeInfo['endHour'],",",jobFormat.desktopTimeInfo['endMinute'],",",jobFormat.host,",",jobFormat.site,",",jobFormat.resource,",",jobFormat.entry,",",jobFormat.endTime,",",jobFormat.toRetire,",",jobFormat.toDie,",",jobFormat.preemptedFreq,",",jobFormat.label
+					preJobLifeCycleDict.pop(fin)
+				for beg in beginJobSet:
+					job = curSnapShot.jobDict[beg]
+					jobLifeCycle = JobLifeCycle(job)
+					curJobLifeCycleDict[beg] = jobLifeCycle
+				preJobSet = curJobSet
+				preJobLifeCycleDict = curJobLifeCycleDict
+				preSnapShot = curSnapShot
+				cnt = cnt + 1
+	tup = (cnt, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+	return tup
 
