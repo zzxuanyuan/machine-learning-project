@@ -173,9 +173,6 @@ class Parser:
 
 	def __init__(self,fileName):
 		self.fileName = fileName
-		with open(self.fileName, "r") as lines:
-			for line in lines:
-				self.lineNumber = self.lineNumber + 1
 
 	def readLine(self,line):
 		snapShot = lineParser(line)
