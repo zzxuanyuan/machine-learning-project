@@ -65,7 +65,7 @@ class SnapShot:
 		self.timeStamp = timeStamp
 		self.jobDict = {}
 		self.jobDict = jobDict
-
+		self.jobNum = len(jobDict)
 
 def extractHost(name):
 	atSplitList = name.split('@')

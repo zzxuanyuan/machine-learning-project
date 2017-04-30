@@ -43,6 +43,7 @@ class JobFormat:
 		self.activityDict = job.activityDict
 		self.stateDict = job.stateDict
 		self.preemptedFreq = job.preemptedFreq
+		self.lastActivity = job.pairActStateList[-1][1]
 		self.label = ""
 
 class JobLifeCycle:
@@ -123,7 +124,10 @@ def getDesktopTimeInfo(deskStart, deskEnd):
 
 def label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat):
 	if int(jobFormat.endTime) < int(jobFormat.toDie) and int(jobFormat.endTime) > int(jobFormat.toRetire):
-		jobFormat.label = "Retired"
+		if jobFormat.lastActivity == "Killing" or jobFormat.lastActivity == "Vacating":
+			jobFormat.label = "Killed"
+		else:
+			jobFormat.label = "Retired"
 	elif int(jobFormat.endTime) > int(jobFormat.toDie):
 		jobFormat.label = "Killed"
 	elif len(jobFormat.daemonStartSet) > 1:
@@ -137,9 +141,19 @@ def label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat):
 		else:
 			jobFormat.label = "NetworkIssue"
 	elif max(jobFormat.activityDict.iteritems(), key=operator.itemgetter(1))[0] is "Idle":
-		jobFormat.label = "Succeeded"
+		if jobFormat.lastActivity == "Idle":
+			jobFormat.label = "CleanUp"
+		else:
+			jobFormat.label = "Stupid"
 	elif max(jobFormat.activityDict.iteritems(), key=operator.itemgetter(1))[0] is "Busy":
-		jobFormat.label = "Succeeded"
+		if jobFormat.lastActivity == "Idle":
+			jobFormat.label = "Succeeded"
+		elif jobFormat.lastActivity == "Busy":
+			jobFormat.label = "Weird"
+		else:
+			jobFormat.label = "NeedIdentify"
+	elif max(jobFormat.activityDict.iteritems(), key=operator.itemgetter(1))[0] is "Benchmarking":
+		jobFormat.label = "Benchmarking"
 	else:
 		jobFormat.label = "Unknown"
 	if jobFormat.jobId not in jobFreqHistoryDict:
