@@ -116,6 +116,8 @@ def getDesktopTimeInfo(deskStart, deskEnd):
 	endTime = datetime.strptime(dateRepEnd + " " + clockEnd, "%m/%d/%y %H:%M:%S")
 	meanTime = startTime+(endTime-startTime)/2
 	timeInfoDict = {}
+	timeInfoDict['startHour'] = startTime.hour
+	timeInfoDict['startMinute'] = startTime.minute
 	timeInfoDict['meanHour'] = meanTime.hour
 	timeInfoDict['meanMinute'] = meanTime.hour * 60 + meanTime.minute
 	timeInfoDict['endHour'] = endTime.hour
@@ -195,7 +197,7 @@ def generateLifeCycleFromFile(fileName, lineCount, preJobSet, curJobSet, preJobL
 	#				print jobFormat.label
 					label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat)
 					jobTimeHistoryDict[finJob.jobId] = finJob.daemonStart
-					print jobFormat.jobId,",",jobFormat.duration,",",jobFormat.retireRuntime,",",jobFormat.killRuntime,",",jobFormat.desktopTimeInfo['meanHour'],",",jobFormat.desktopTimeInfo['meanMinute'],",",jobFormat.desktopTimeInfo['endHour'],",",jobFormat.desktopTimeInfo['endMinute'],",",jobFormat.host,",",jobFormat.site,",",jobFormat.resource,",",jobFormat.entry,",",jobFormat.endTime,",",jobFormat.toRetire,",",jobFormat.toDie,",",jobFormat.preemptedFreq,",",jobFormat.label
+					print jobFormat.jobId,",",jobFormat.duration,",",jobFormat.retireRuntime,",",jobFormat.killRuntime,",",curSnapShot.jobNum,",",jobFormat.desktopTimeInfo['startHour'],",",jobFormat.desktopTimeInfo['startMinute'],",",jobFormat.desktopTimeInfo['meanHour'],",",jobFormat.desktopTimeInfo['meanMinute'],",",jobFormat.desktopTimeInfo['endHour'],",",jobFormat.desktopTimeInfo['endMinute'],",",jobFormat.host,",",jobFormat.site,",",jobFormat.resource,",",jobFormat.entry,",",jobFormat.endTime,",",jobFormat.toRetire,",",jobFormat.toDie,",",jobFormat.preemptedFreq,",",jobFormat.label
 					preJobLifeCycleDict.pop(fin)
 				for beg in beginJobSet:
 					job = curSnapShot.jobDict[beg]
