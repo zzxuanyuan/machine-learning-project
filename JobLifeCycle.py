@@ -26,24 +26,24 @@ jobTimeHistoryDict = {}
 
 class JobFormat:
 
-	def __init__(self, job):
-		self.duration = int(job.endTime) - int(job.startTime)
-		self.retireRuntime = int(job.toRetire) - int(job.startTime)
-		self.killRuntime = int(job.toDie) - int(job.startTime)
-		self.desktopTimeInfo = getDesktopTimeInfo(job.desktopStart, job.desktopEnd)
-		self.host = job.host
-		self.site = job.site
-		self.resource = job.resource
-		self.entry = job.entry
-		self.endTime = job.endTime
-		self.toRetire = job.toRetire
-		self.toDie = job.toDie
-		self.jobId = job.jobId
-		self.daemonStartSet = job.daemonStartSet
-		self.activityDict = job.activityDict
-		self.stateDict = job.stateDict
-		self.preemptedFreq = job.preemptedFreq
-		self.lastActivity = job.pairActStateList[-1][1]
+	def __init__(self, jobLifeCycle):
+		self.duration = int(jobLifeCycle.endTime) - int(jobLifeCycle.startTime)
+		self.retireRuntime = int(jobLifeCycle.toRetire) - int(jobLifeCycle.startTime)
+		self.killRuntime = int(jobLifeCycle.toDie) - int(jobLifeCycle.startTime)
+		self.desktopTimeInfo = getDesktopTimeInfo(jobLifeCycle.desktopStart, jobLifeCycle.desktopEnd)
+		self.host = jobLifeCycle.host
+		self.site = jobLifeCycle.site
+		self.resource = jobLifeCycle.resource
+		self.entry = jobLifeCycle.entry
+		self.endTime = jobLifeCycle.endTime
+		self.toRetire = jobLifeCycle.toRetire
+		self.toDie = jobLifeCycle.toDie
+		self.jobId = jobLifeCycle.jobId
+		self.daemonStartSet = jobLifeCycle.daemonStartSet
+		self.activityDict = jobLifeCycle.activityDict
+		self.stateDict = jobLifeCycle.stateDict
+		self.preemptedFreq = jobLifeCycle.preemptedFreq
+		self.lastActivity = jobLifeCycle.pairActStateList[-1][1]
 		self.label = ""
 
 class JobLifeCycle:
