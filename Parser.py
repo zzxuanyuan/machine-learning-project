@@ -27,7 +27,7 @@ class Job:
 		self.site = site
 		self.resource = resource
 		self.entry = entry
-		self.daemonStart = daemonStart
+		self.daemonStart = int(daemonStart)
 		self.toRetire = toRetire
 		self.toDie = toDie
 		self.jobId = jobId
@@ -51,7 +51,7 @@ class Act:
 		self.site = site
 		self.resource = resource
 		self.entry = entry
-		self.daemonStart = daemonStart
+		self.daemonStart = int(daemonStart)
 		self.jobStart = jobStart
 		self.toRetire = toRetire
 		self.toDie = toDie
@@ -120,7 +120,7 @@ def itemParser(its):
 	if "DaemonStartTime" in itemDict:
 		daemonStart = itemDict["DaemonStartTime"]
 	else:
-		daemonStart = ""
+		daemonStart = 0
 
 	if "JobStart" in itemDict:
 		jobStart = itemDict["JobStart"]

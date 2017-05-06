@@ -39,7 +39,7 @@ class JobFormat:
 		self.toRetire = jobLifeCycle.toRetire
 		self.toDie = jobLifeCycle.toDie
 		self.jobId = jobLifeCycle.jobId
-		self.daemonStartSet = jobLifeCycle.daemonStartSet
+		self.daemonStart = jobLifeCycle.startTime
 		self.activityDict = jobLifeCycle.activityDict
 		self.stateDict = jobLifeCycle.stateDict
 		self.preemptedFreq = jobLifeCycle.preemptedFreq
@@ -69,8 +69,6 @@ class JobLifeCycle:
 		self.toRetire = job.toRetire
 		self.toDie = job.toDie
 		self.jobId = job.jobId
-		self.daemonStartSet = set()
-		self.daemonStartSet.add(job.daemonStart)
 		self.activityDict = {"Idle":0,"Benchmarking":0,"Busy":0,"Suspended":0,"Retiring":0,"Vacating":0,"Killing":0}
 		self.stateDict = {"Owner":0,"Unclaimed":0,"Matched":0,"Claimed":0,"Preempting":0,"Backfill":0,"Drained":0}
 		self.activityDict[job.activity] = 1
@@ -85,15 +83,14 @@ class JobLifeCycle:
 		self.endTime = endTime
 		self.desktopEnd = desktopEnd
 
-	def stay(self, curTime, daemonStart, activity, state):
+	def stay(self, curTime, activity, state):
 		self.cycle = self.cycle + 1
 		self.activityDict[activity] += 1
 		self.stateDict[state] += 1
-		self.daemonStartSet.add(daemonStart)
 		tup = (curTime, activity, state)
 		self.pairActStateList.append(tup)
 
-	def change(self, curTime, daemonStart, activity, state):
+	def change(self, curTime, activity, state):
 		tup = (curTime, activity, state)
 		self.pairActStateList.append(tup)
 	
@@ -117,7 +114,7 @@ def getDesktopTimeInfo(deskStart, deskEnd):
 	meanTime = startTime+(endTime-startTime)/2
 	timeInfoDict = {}
 	timeInfoDict['startHour'] = startTime.hour
-	timeInfoDict['startMinute'] = startTime.minute
+	timeInfoDict['startMinute'] = startTime.hour * 60 + startTime.minute
 	timeInfoDict['meanHour'] = meanTime.hour
 	timeInfoDict['meanMinute'] = meanTime.hour * 60 + meanTime.minute
 	timeInfoDict['endHour'] = endTime.hour
@@ -132,14 +129,14 @@ def label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat):
 			jobFormat.label = "Retired"
 	elif int(jobFormat.endTime) > int(jobFormat.toDie):
 		jobFormat.label = "Killed"
-	elif len(jobFormat.daemonStartSet) > 1:
-		jobFormat.preemptedFreq = len(jobFormat.daemonStartSet)
-		jobFormat.label = "LightPreempted"
+#	elif len(jobFormat.daemonStartSet) > 1:
+#		jobFormat.preemptedFreq = len(jobFormat.daemonStartSet)
+#		jobFormat.label = "LightPreempted"
 	elif jobFormat.jobId in jobFreqHistoryDict:
-		if jobTimeHistoryDict[jobFormat.jobId] not in jobFormat.daemonStartSet:
+		if jobTimeHistoryDict[jobFormat.jobId] != jobFormat.daemonStart:
 			jobFreqHistoryDict[jobFormat.jobId] += 1
 			jobFormat.preemptedFreq = jobFreqHistoryDict[jobFormat.jobId]
-			jobFormat.label = "HeavyPreempted"
+			jobFormat.label = "Preempted"
 		else:
 			jobFormat.label = "NetworkIssue"
 	elif max(jobFormat.activityDict.iteritems(), key=operator.itemgetter(1))[0] is "Idle":
@@ -184,8 +181,13 @@ def generateLifeCycleFromFile(fileName, lineCount, preJobSet, curJobSet, preJobL
 				for inter in intersectJobSet:
 					interJobLifeCycle = preJobLifeCycleDict[inter]
 					interJob = curSnapShot.jobDict[inter]
-					interJobLifeCycle.stay(interJob.timeAbs,interJob.daemonStart,interJob.activity,interJob.state)
-					curJobLifeCycleDict[inter] = interJobLifeCycle
+					if interJob.daemonStart == interJobLifeCycle.startTime:
+						interJobLifeCycle.stay(interJob.timeAbs,interJob.activity,interJob.state)
+						curJobLifeCycleDict[inter] = interJobLifeCycle
+					else:
+#						print interJob.daemonStart, interJobLifeCycle.startTime
+						finishJobSet.add(inter)
+						beginJobSet.add(inter)
 				for fin in finishJobSet:
 					finJob = preSnapShot.jobDict[fin]
 					preJobLifeCycleDict[fin].stop(finJob.timeAbs, finJob.desktopTime)
@@ -196,6 +198,8 @@ def generateLifeCycleFromFile(fileName, lineCount, preJobSet, curJobSet, preJobL
 	#				print jobFormat.activityDict,jobFormat.stateDict,jobFormat.daemonStartSet
 	#				print jobFormat.label
 					label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat)
+					if jobFormat.daemonStart != finJob.daemonStart:
+						print "WARNING: Something wrong!!!!!!!!!!!!!!!"
 					jobTimeHistoryDict[finJob.jobId] = finJob.daemonStart
 					print jobFormat.jobId,",",jobFormat.duration,",",jobFormat.retireRuntime,",",jobFormat.killRuntime,",",curSnapShot.jobNum,",",jobFormat.desktopTimeInfo['startHour'],",",jobFormat.desktopTimeInfo['startMinute'],",",jobFormat.desktopTimeInfo['meanHour'],",",jobFormat.desktopTimeInfo['meanMinute'],",",jobFormat.desktopTimeInfo['endHour'],",",jobFormat.desktopTimeInfo['endMinute'],",",jobFormat.host,",",jobFormat.site,",",jobFormat.resource,",",jobFormat.entry,",",jobFormat.endTime,",",jobFormat.toRetire,",",jobFormat.toDie,",",jobFormat.preemptedFreq,",",jobFormat.label
 					preJobLifeCycleDict.pop(fin)
