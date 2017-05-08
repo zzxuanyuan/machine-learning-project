@@ -6,6 +6,7 @@
 #!/usr/bin/python
 
 import sys
+import operator
 
 class Job:
 #	activity = ""
@@ -19,11 +20,15 @@ class Job:
 
 	def __init__(self,desktopTime,activity,timeAbs,name,state,site,resource,entry,daemonStart,toRetire,toDie,jobId):
 		self.desktopTime = desktopTime
-		self.activity = activity
+		self.activityDict = {"Idle":0,"Benchmarking":0,"Busy":0,"Suspended":0,"Retiring":0,"Vacating":0,"Killing":0}
+		self.stateDict = {"Owner":0,"Unclaimed":0,"Matched":0,"Claimed":0,"Preempting":0,"Backfill":0,"Drained":0}
+		self.activity = "NONE"
+		self.state = "NONE"
+		self.activityDict[activity] = 1
+		self.stateDict[state] = 1
 		self.timeAbs = timeAbs
 		self.name = name
-		self.host = "\"" + extractHost(name)
-		self.state = state
+		self.host = extractHost(name)
 		self.site = site
 		self.resource = resource
 		self.entry = entry
@@ -32,6 +37,11 @@ class Job:
 		self.toDie = toDie
 		self.jobId = jobId
 		self.cycle = 1
+
+	def merge(self,activity,state):
+		self.activityDict[activity] += 1
+		self.stateDict[state] += 1
+		
 
 class Act:
 #	activity = ""
@@ -51,7 +61,7 @@ class Act:
 		self.site = site
 		self.resource = resource
 		self.entry = entry
-		self.daemonStart = int(daemonStart)
+		self.daemonStart = daemonStart
 		self.jobStart = jobStart
 		self.toRetire = toRetire
 		self.toDie = toDie
@@ -88,12 +98,12 @@ def itemParser(its):
 		activity = ""
 
 	if "MyCurrentTime" in itemDict:
-		timeAbs = itemDict["MyCurrentTime"]
+		timeAbs = int(itemDict["MyCurrentTime"].strip())
 	else:
 		timeAbs = 0
 
 	if "Name" in itemDict:
-		name = itemDict["Name"]
+		name = itemDict["Name"].strip("\"")
 	else:
 		name = ""
 
@@ -103,22 +113,22 @@ def itemParser(its):
 		state = ""
 
 	if "GLIDEIN_Site" in itemDict:
-		site = itemDict["GLIDEIN_Site"]
+		site = itemDict["GLIDEIN_Site"].strip("\"")
 	else:
 		site = ""
 
 	if "GLIDEIN_ResourceName" in itemDict:
-		resource = itemDict["GLIDEIN_ResourceName"]
+		resource = itemDict["GLIDEIN_ResourceName"].strip("\"")
 	else:
 		resource = ""
 
 	if "GLIDEIN_Entry_Name" in itemDict:
-		entry = itemDict["GLIDEIN_Entry_Name"]
+		entry = itemDict["GLIDEIN_Entry_Name"].strip("\"")
 	else:
 		entry = ""
 
 	if "DaemonStartTime" in itemDict:
-		daemonStart = itemDict["DaemonStartTime"]
+		daemonStart = int(itemDict["DaemonStartTime"].strip())
 	else:
 		daemonStart = 0
 
@@ -128,17 +138,17 @@ def itemParser(its):
 		jobStart = ""
 
 	if "GLIDEIN_ToRetire" in itemDict:
-		toRetire = itemDict["GLIDEIN_ToRetire"]
+		toRetire = int(itemDict["GLIDEIN_ToRetire"].strip())
 	else:
 		toRetire = 0
 
 	if "GLIDEIN_ToDie" in itemDict:
-		toDie = itemDict["GLIDEIN_ToDie"]
+		toDie = int(itemDict["GLIDEIN_ToDie"].strip())
 	else:
 		toDie = 0
 
 	if "GLIDEIN_SITEWMS_JobId" in itemDict:
-		jobId = itemDict["GLIDEIN_SITEWMS_JobId"]
+		jobId = itemDict["GLIDEIN_SITEWMS_JobId"].strip("\"")
 	else:
 		jobId = ""
 	item = Act(activity,timeAbs,name,state,site,resource,entry,daemonStart,jobStart,toRetire,toDie,jobId)
@@ -149,8 +159,16 @@ def actParser(desktopTime, acts):
 	actList = acts.split(', ')
 	for i in range(len(actList)):
 		item = itemParser(actList[i])
-		job = Job(desktopTime,item.activity,item.timeAbs,item.name,item.state,item.site,item.resource,item.entry,item.daemonStart,item.toRetire,item.toDie,item.jobId)
-		itemDict[item.jobId] = job
+		if item.jobId in itemDict:
+			itemDict[item.jobId].merge(item.activity,item.state)
+		else:
+			job = Job(desktopTime,item.activity,item.timeAbs,item.name,item.state,item.site,item.resource,item.entry,item.daemonStart,item.toRetire,item.toDie,item.jobId)
+			itemDict[item.jobId] = job
+	for item in itemDict:
+		itemDict[item].activity = max(itemDict[item].activityDict.iteritems(), key=operator.itemgetter(1))[0]
+		itemDict[item].state =  max(itemDict[item].stateDict.iteritems(), key=operator.itemgetter(1))[0]
+#		print item,itemDict[item].activity,itemDict[item].state
+#		print item,itemDict[item].activityDict,itemDict[item].stateDict
 	return itemDict
 
 def lineParser(line):
@@ -162,6 +180,7 @@ def lineParser(line):
 	endList = body.rfind("]")
 	substr = body[startList+1:endList]
 	timeStrip = time.strip()
+#	print "timeStrip: ",timeStrip
 	actDict = actParser(timeStrip, substr)
 	snapShot = SnapShot(timeStrip, actDict)
 	return snapShot

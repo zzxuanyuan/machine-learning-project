@@ -113,6 +113,8 @@ def getDesktopTimeInfo(deskStart, deskEnd):
 	endTime = datetime.strptime(dateRepEnd + " " + clockEnd, "%m/%d/%y %H:%M:%S")
 	meanTime = startTime+(endTime-startTime)/2
 	timeInfoDict = {}
+	timeInfoDict['startDate'] = dateRepStart
+	timeInfoDict['endDate'] = dateRepEnd
 	timeInfoDict['startHour'] = startTime.hour
 	timeInfoDict['startMinute'] = startTime.hour * 60 + startTime.minute
 	timeInfoDict['meanHour'] = meanTime.hour
@@ -125,10 +127,15 @@ def label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat):
 	if int(jobFormat.endTime) < int(jobFormat.toDie) and int(jobFormat.endTime) > int(jobFormat.toRetire):
 		if jobFormat.lastActivity == "Killing" or jobFormat.lastActivity == "Vacating":
 			jobFormat.label = "Killed"
-		else:
+		elif jobFormat.lastActivity == "Retiring":
 			jobFormat.label = "Retired"
+		else:
+			jobFormat.label = jobFormat.lastActivity+"Retire"
 	elif int(jobFormat.endTime) > int(jobFormat.toDie):
-		jobFormat.label = "Killed"
+		if jobFormat.lastActivity == "Killing":
+			jobFormat.label = "Killed"
+		else:
+			jobFormat.label = jobFormat.lastActivity+"Kill"
 #	elif len(jobFormat.daemonStartSet) > 1:
 #		jobFormat.preemptedFreq = len(jobFormat.daemonStartSet)
 #		jobFormat.label = "LightPreempted"
@@ -143,18 +150,18 @@ def label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat):
 		if jobFormat.lastActivity == "Idle":
 			jobFormat.label = "CleanUp"
 		else:
-			jobFormat.label = "Stupid"
+			jobFormat.label = jobFormat.lastActivity+"Stupid"
 	elif max(jobFormat.activityDict.iteritems(), key=operator.itemgetter(1))[0] is "Busy":
 		if jobFormat.lastActivity == "Idle":
 			jobFormat.label = "Succeeded"
 		elif jobFormat.lastActivity == "Busy":
 			jobFormat.label = "Weird"
 		else:
-			jobFormat.label = "NeedIdentify"
+			jobFormat.label = jobFormat.lastActivity+"NeedIdentify"
 	elif max(jobFormat.activityDict.iteritems(), key=operator.itemgetter(1))[0] is "Benchmarking":
 		jobFormat.label = "Benchmarking"
 	else:
-		jobFormat.label = "Unknown"
+		jobFormat.label = jobFormat.lastActivity+"Unknown"
 	if jobFormat.jobId not in jobFreqHistoryDict:
 		jobFreqHistoryDict[jobFormat.jobId] = 1
 		
@@ -201,7 +208,7 @@ def generateLifeCycleFromFile(fileName, lineCount, preJobSet, curJobSet, preJobL
 					if jobFormat.daemonStart != finJob.daemonStart:
 						print "WARNING: Something wrong!!!!!!!!!!!!!!!"
 					jobTimeHistoryDict[finJob.jobId] = finJob.daemonStart
-					print jobFormat.jobId,",",jobFormat.duration,",",jobFormat.retireRuntime,",",jobFormat.killRuntime,",",curSnapShot.jobNum,",",jobFormat.desktopTimeInfo['startHour'],",",jobFormat.desktopTimeInfo['startMinute'],",",jobFormat.desktopTimeInfo['meanHour'],",",jobFormat.desktopTimeInfo['meanMinute'],",",jobFormat.desktopTimeInfo['endHour'],",",jobFormat.desktopTimeInfo['endMinute'],",",jobFormat.host,",",jobFormat.site,",",jobFormat.resource,",",jobFormat.entry,",",jobFormat.endTime,",",jobFormat.toRetire,",",jobFormat.toDie,",",jobFormat.preemptedFreq,",",jobFormat.label
+					print jobFormat.jobId,",",jobFormat.duration,",",jobFormat.retireRuntime,",",jobFormat.killRuntime,",",curSnapShot.jobNum,",",jobFormat.desktopTimeInfo['startDate'],",",jobFormat.desktopTimeInfo['endDate'],",",jobFormat.desktopTimeInfo['startHour'],",",jobFormat.desktopTimeInfo['startMinute'],",",jobFormat.desktopTimeInfo['meanHour'],",",jobFormat.desktopTimeInfo['meanMinute'],",",jobFormat.desktopTimeInfo['endHour'],",",jobFormat.desktopTimeInfo['endMinute'],",",jobFormat.host,",",jobFormat.site,",",jobFormat.resource,",",jobFormat.entry,",",jobFormat.endTime,",",jobFormat.toRetire,",",jobFormat.toDie,",",jobFormat.preemptedFreq,",",jobFormat.label
 					preJobLifeCycleDict.pop(fin)
 				for beg in beginJobSet:
 					job = curSnapShot.jobDict[beg]

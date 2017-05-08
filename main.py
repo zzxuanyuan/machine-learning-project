@@ -241,3 +241,161 @@ curSnapShot = tup[6]
 
 print "20. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
 print "20. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/04262017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "21. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "21. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/04272017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "22. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "22. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/04282017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "23. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "23. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/04292017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "24. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "24. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/04302017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "25. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "25. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/05012017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "26. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "26. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/05022017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "27. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "27. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/05032017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "28. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "28. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/05042017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "29. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "29. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/05052017.firsthalf.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "30.(first half) Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "30.(first half) Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/05052017.secondhalf.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "30.(second half) Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "30.(second half) Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/05062017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "31. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "31. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+tup = JobLifeCycle.generateLifeCycleFromFile("/mnt/home.centos.data/05072017.data", totalLineCount, preJobSet, curJobSet, preJobLifeCycleDict, curJobLifeCycleDict, preSnapShot, curSnapShot)
+totalLineCount += tup[0]
+preJobSet = tup[1]
+curJobSet = tup[2]
+preJobLifeCycleDict = tup[3]
+curJobLifeCycleDict = tup[4]
+preSnapShot = tup[5]
+curSnapShot = tup[6]
+
+print "32. Job Freq Hisotry Dict:", len(JobLifeCycle.jobFreqHistoryDict.keys())
+print "32. Job Time Hisotry Dict:", len(JobLifeCycle.jobTimeHistoryDict.keys())
+
+
