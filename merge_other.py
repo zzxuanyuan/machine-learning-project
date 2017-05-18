@@ -15,6 +15,10 @@ with open(sys.argv[1], 'r') as fr:
 			row[-1] = 'Other'
 		elif(row[-1] == 'Unknown'):
 			row[-1] = 'Other'
+		elif(row[-1] == 'NetworkIssue'):
+			row[-1] = 'Other'
+		elif(row[-1] == 'Benchmarking'):
+			row[-1] = 'Other'
 		lines.append(row)
 
 with open(sys.argv[2], 'w') as fw:
