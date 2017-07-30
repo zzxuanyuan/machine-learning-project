@@ -27,8 +27,8 @@ class Job:
 		self.activityDict[activity] = 1
 		self.stateDict[state] = 1
 		self.timeAbs = timeAbs
-		self.name = name
-		self.host = extractHost(name)
+		self.name = set([name])
+		self.host = set([extractHost(name)])
 		self.site = site
 		self.resource = resource
 		self.entry = entry
@@ -38,9 +38,12 @@ class Job:
 		self.jobId = jobId
 		self.cycle = 1
 
-	def merge(self,activity,state):
+	def merge(self,timeAbs,activity,state,name):
+		self.timeAbs = min(self.timeAbs,timeAbs)
 		self.activityDict[activity] += 1
 		self.stateDict[state] += 1
+		self.name.add(name)
+		self.host.add(extractHost(name))
 		
 
 class Act:
@@ -160,7 +163,7 @@ def actParser(desktopTime, acts):
 	for i in range(len(actList)):
 		item = itemParser(actList[i])
 		if item.jobId in itemDict:
-			itemDict[item.jobId].merge(item.activity,item.state)
+			itemDict[item.jobId].merge(item.timeAbs,item.activity,item.state,item.name)
 		else:
 			job = Job(desktopTime,item.activity,item.timeAbs,item.name,item.state,item.site,item.resource,item.entry,item.daemonStart,item.toRetire,item.toDie,item.jobId)
 			itemDict[item.jobId] = job

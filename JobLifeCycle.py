@@ -11,7 +11,6 @@ from datetime import datetime
 import operator
 import Parser
 
-print "this is joblifecycle"
 global jobFreqHistoryDict
 global jobTimeHistoryDict
 jobFreqHistoryDict = {}
@@ -83,10 +82,12 @@ class JobLifeCycle:
 		self.endTime = endTime
 		self.desktopEnd = desktopEnd
 
-	def stay(self, curTime, activity, state):
+	def stay(self, curTime, activity, state, host):
+		self.startTime = min(self.startTime, curTime)
 		self.cycle = self.cycle + 1
 		self.activityDict[activity] += 1
 		self.stateDict[state] += 1
+		self.host = self.host.union(host)
 		tup = (curTime, activity, state)
 		self.pairActStateList.append(tup)
 
@@ -188,11 +189,11 @@ def generateLifeCycleFromFile(fileName, lineCount, preJobSet, curJobSet, preJobL
 				for inter in intersectJobSet:
 					interJobLifeCycle = preJobLifeCycleDict[inter]
 					interJob = curSnapShot.jobDict[inter]
-					if interJob.daemonStart == interJobLifeCycle.startTime:
-						interJobLifeCycle.stay(interJob.timeAbs,interJob.activity,interJob.state)
+					preJob = preSnapShot.jobDict[inter]
+					if interJob.daemonStart == interJobLifeCycle.startTime or interJob.host.intersection(preJob.host):
+						interJobLifeCycle.stay(interJob.timeAbs,interJob.activity,interJob.state,interJob.host)
 						curJobLifeCycleDict[inter] = interJobLifeCycle
 					else:
-#						print interJob.daemonStart, interJobLifeCycle.startTime
 						finishJobSet.add(inter)
 						beginJobSet.add(inter)
 				for fin in finishJobSet:
@@ -205,8 +206,8 @@ def generateLifeCycleFromFile(fileName, lineCount, preJobSet, curJobSet, preJobL
 	#				print jobFormat.activityDict,jobFormat.stateDict,jobFormat.daemonStartSet
 	#				print jobFormat.label
 					label(jobFreqHistoryDict, jobTimeHistoryDict, jobFormat)
-					if jobFormat.daemonStart != finJob.daemonStart:
-						print "WARNING: Something wrong!!!!!!!!!!!!!!!"
+#					if jobFormat.daemonStart != finJob.daemonStart:
+#						print jobFormat.jobId, jobFormat.daemonStart, finJob.daemonStart, "WARNING: Something wrong!!!!!!!!!!!!!!!"
 					jobTimeHistoryDict[finJob.jobId] = finJob.daemonStart
 					print jobFormat.jobId,",",jobFormat.duration,",",jobFormat.retireRuntime,",",jobFormat.killRuntime,",",curSnapShot.jobNum,",",jobFormat.desktopTimeInfo['startDate'],",",jobFormat.desktopTimeInfo['endDate'],",",jobFormat.desktopTimeInfo['startHour'],",",jobFormat.desktopTimeInfo['startMinute'],",",jobFormat.desktopTimeInfo['meanHour'],",",jobFormat.desktopTimeInfo['meanMinute'],",",jobFormat.desktopTimeInfo['endHour'],",",jobFormat.desktopTimeInfo['endMinute'],",",jobFormat.host,",",jobFormat.site,",",jobFormat.resource,",",jobFormat.entry,",",jobFormat.endTime,",",jobFormat.toRetire,",",jobFormat.toDie,",",jobFormat.preemptedFreq,",",jobFormat.label
 					preJobLifeCycleDict.pop(fin)
